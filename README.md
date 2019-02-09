@@ -15,7 +15,7 @@ Alternatively, you can use [Anaconda](https://www.anaconda.com/download/) to ins
 A detailed description of obtaining and installing Gurobi license is given [here](https://www.gurobi.com/documentation/8.1/quickstart_mac/retrieving_and_setting_up_.html).   
 
 ****
-Once you have have the checked the steps above. You may consider refering to the [Beginners Guide](https://wiki.python.org/moin/BeginnersGuide). Or, just start a python console to simulate the RBA model of phototrophic growth. 
+Once you have have checked the steps above. You may consider refering to the [Beginners Guide](https://wiki.python.org/moin/BeginnersGuide). Or, just start a python console to simulate the RBA model of phototrophic growth. 
 
 #### 4. To reproduce plots from the manuscript type the following in your python console:
     run plot_results.py
