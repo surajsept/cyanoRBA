@@ -5,7 +5,7 @@ The framework is developed using Python 3.
 
 ****
 #### 1. Getting python
-You can downlaod the latest version of Python [here](https://www.python.org/downloads/).
+You can download the latest version of Python [here](https://www.python.org/downloads/).
 Alternatively, you can use [Anaconda](https://www.anaconda.com/download/) to install python for your computer (Linux, Windows, Mac).
   
 #### 2. Installing packages using requirement file
