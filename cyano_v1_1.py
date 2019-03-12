@@ -74,14 +74,14 @@ def cyano_model(mu, Cx, Nx, I, newpars):
 	                   B_eq[i] for i in range (len (B_eq))), 'mass_conservation')
 	
 	### Constant density
-	A_eq2 = np.hstack ((np.zeros (len (rxns) + len (gammas)), alpha_P, np.zeros (len (Misc))))
+	A_eq2 = np.hstack ((np.zeros (len (rxns) + len (gammas)), alpha_P, [1.0,]))
 	model.addConstr (quicksum (A_eq2[i] * x[i] for i in range (len (A_eq2))) == 1.4e10,
 	                 'fixed_density')
 	
 	### Constant concentration of Q protein
 	A_eq3 = np.zeros (len (x_name))
-	A_eq3[x_name.index ('Q')] = p.nQ
-	B_eq3 = np.hstack ((np.zeros (len (rxns) + len (gammas)), alpha_P, [p.nQ, ]))
+	A_eq3[x_name.index ('Q')] = 1.0
+	B_eq3 = np.hstack ((np.zeros (len (rxns) + len (gammas)), alpha_P, [1.0, ]))
 	model.addConstr (quicksum (A_eq3[i] * x[i] for i in range (len (A_eq3))) == 0.6 * quicksum (
 		B_eq3[i] * x[i] for i in range (len (A_eq3))), 'fixed_Q_conc_ratio')
 	

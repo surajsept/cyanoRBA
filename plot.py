@@ -1,4 +1,3 @@
-from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import numpy as np
@@ -37,7 +36,7 @@ def plotTnTy_Mu(X, Y, Y0, Y1, ax):
 	ax.set_ylabel('Growth rate, $\mu$ ($day^{-1}$)', fontsize=12)
 	ax.legend(fontsize=15)
 	ax.tick_params(labelsize=12)
-	ax.tight_layout()
+	plt.tight_layout()
 	#return plt.show()
 
 def plotTnTy(X, Y1, Y2, ax):
@@ -54,41 +53,41 @@ def plotTnTy(X, Y1, Y2, ax):
 def subplots_TnTy(y_N, y_Y, y_NY, pF_NY, model):
 	fig, ax = plt.subplots(1, 2, figsize=(10, 4))
 	plotTnTy_Mu(y_N.Nx/model.p.K_N, y_N.Mu, y_Y.Mu, y_NY.Mu, ax[0])
-	plotTnTy(y_N.Nx/model.p.K_N, pF_NY.T_N1, pF_NY.T_N2, ax[1])
+	plotTnTy(y_N.Nx/model.p.K_N, pF_NY.T_N2, pF_NY.T_N1, ax[1])
 	return plt.show()
 
-def co_culture(data1, data2, light, fsize=15):
+def co_culture(data1, data2, Irr, fsize=15):
 	fig, ax = plt.subplots(2,2, figsize=(10,5))
 	# subplot1
-	ax[0, 0].plot (data1[:, 0] / 365, data1[:, 1], 'C0', label='Gleaner', linewidth=2.0)
-	ax[0, 0].plot (data1[:, 0] / 365, data1[:, 2], 'C1', label='Opportunist', linewidth=2.0)
+	ax[0, 0].plot(data1.t / 365, data1.nG, 'C0', label='Gleaner', linewidth=2.0)
+	ax[0, 0].plot(data1.t / 365, data1.nO, 'C1', label='Opportunist', linewidth=2.0)
 	ax[0, 0].set_ylabel('number of cells l$^{-1}$', fontsize=fsize)
 	ax[0, 0].tick_params(labelsize=12)
-	ax[0, 0].legend (fontsize=12, ncol=2, bbox_to_anchor=(0.87, 1.25))
+	ax[0, 0].legend (fontsize=12, ncol=2, bbox_to_anchor=(1.02, 1.25))
 	
 	# subplot 2
-	ax[0, 1].plot ((data2[:, 0] - 365) / 365, data2[:, 1], 'C0', label='Gleaner', linewidth=2.0)
-	ax[0, 1].plot ((data2[:, 0] - 365) / 365, data2[:, 2], 'C1', label='Opportunist', linewidth=2.0)
+	ax[0, 1].plot(data2.t / 365, data2.nG, 'C0', label='Gleaner', linewidth=2.0)
+	ax[0, 1].plot(data2.t / 365, data2.nO, 'C1', label='Opportunist', linewidth=2.0)
 	ax[0, 1].tick_params (labelsize=12)
 	ax[0, 1].legend(fontsize=12, ncol=2, bbox_to_anchor=(1.02, 1.25))
 	
 	# subplot3
-	ax[1, 0].plot (data1[:, 0] / 365, data1[:, 3], 'C2', label='$N_x$', linewidth=2.0)
-	ax[1, 0].set_ylabel ('N$_x$ ($\mu$M)', fontsize=fsize)
-	ax[1, 0].set_xlabel ('years', fontsize=fsize)
-	ax[1, 0].tick_params (labelsize=12)
+	ax[1, 0].plot(data1.t / 365, data1.N, 'C2', label='$N_x$', linewidth=2.0)
+	ax[1, 0].set_ylabel('N$_x$ ($\mu$M)', fontsize=fsize)
+	ax[1, 0].set_xlabel('years', fontsize=fsize)
+	ax[1, 0].tick_params(labelsize=12)
 	ax2 = ax[1,0].twinx()
-	ax2.plot (data1[:, 0] / 365, 200*np.ones(len(data1)), 'r--', linewidth=2.0)
-	ax2.tick_params ('y', colors='r', labelsize=12)
+	ax2.plot(data1.t / 365, 200*np.ones(len(data1.t)), 'r--', linewidth=2.0)
+	ax2.tick_params('y', colors='r', labelsize=12)
 	
 	# subplot4
-	ax[1, 1].plot ((data2[:, 0] - 365) / 365, data2[:, 3], 'C2', label='$N_x$', linewidth=2.0)
-	ax[1, 1].set_xlabel ('years', fontsize=fsize)
-	ax[1, 1].tick_params (labelsize=12)
-	ax2 = ax[1, 1].twinx ()
-	ax2.plot ((data2[:, 0] - 365) / 365, light, 'r--', linewidth=2.0)
-	ax2.set_ylabel ('I ($\mu$ E mu$^{-2}$ s$^{-1}$)', fontsize=15, color='r')
-	ax2.tick_params ('y', colors='r', labelsize=12)
+	ax[1, 1].plot(data2.t / 365, data2.N, 'C2', label='$N_x$', linewidth=2.0)
+	ax[1, 1].set_xlabel('years', fontsize=fsize)
+	ax[1, 1].tick_params(labelsize=12)
+	ax2 = ax[1, 1].twinx()
+	ax2.plot(data2.t / 365, Irr, 'r--', linewidth=2.0)
+	ax2.set_ylabel('I ($\mu$ E mu$^{-2}$ s$^{-1}$)', fontsize=15, color='r')
+	ax2.tick_params('y', colors='r', labelsize=12)
 	
 	plt.tight_layout()
 	return plt.show()
@@ -115,17 +114,31 @@ def piesample(ax, size1):
 	ax.axis ('equal')
 	plt.setp (autotexts, weight="bold", color="white", fontsize=15)
 	plt.tight_layout()
-	return plt.show()
 
 def pie_subplots(pFN, pFC, pFI):
 	fig, ax = plt.subplots(2,3, figsize=[15, 8])
-	piesample(ax[0, 0], pFN[1])
-	piesample(ax[1, 0], pFN[-2])
-	piesample (ax[0, 1], pFC[1])
-	piesample (ax[1, 1], pFC[-2])
-	piesample (ax[0, 2], pFI[1])
-	piesample (ax[1, 2], pFI[-2])
+	piesample(ax[0, 0], pFN[10])
+	piesample(ax[1, 0], pFN[1005])
+	piesample(ax[0, 1], pFC[10])
+	piesample(ax[1, 1], pFC[1005])
+	piesample(ax[0, 2], pFI[1])
+	piesample(ax[1, 2], pFI[-2])
 	return plt.show()
+
+def growth_subplots(yN, yC, yI):
+	fig, ax = plt.subplots(1,3, figsize=[12, 4])
+	growth_curve(ax[0], yN.Nx / 10.0, 86400*yN.Mu, xlabel='N$_x$/K$_N$', ylabel='Growth rate, $\mu$ (d$^{-1}$)')
+	growth_curve(ax[1], yC.Cx / 15.0, 86400*yC.Mu, xlabel='C$_x$/K$_N$', ylabel='Growth rate, $\mu$ (d$^{-1}$)')
+	growth_curve(ax[2], yI.Irr, 86400*yI.Mu, xlabel='I ($\mu$ E m$^{-2}$ s$^{-1}$)', ylabel='Growth rate, $\mu$ (d$^{-1}$)')
+	return plt.show()
+
+def growth_curve(ax, X, Y, xlabel, ylabel):
+	ax.plot(X, Y, linewidth=2.0)
+	ax.set_xlabel(xlabel, fontsize=15)
+	ax.set_ylabel(ylabel, fontsize=15)
+	ax.tick_params(labelsize=15)
+	plt.tight_layout()
+	
 
 def basic_plot(X, Y, xlabel, ylabel, text, text_lx=0.3, text_ly=0.1):
 	fig, ax = plt.subplots(figsize=[4,4])
