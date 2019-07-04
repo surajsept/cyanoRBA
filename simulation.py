@@ -204,6 +204,52 @@ class simulate_cyano():
         dydt = [dRho1_dt, dRho2_dt, dNdt]
         return dydt
 
+    def chemostat_fixedI(self, y, t):
+        """ODEs used to calculate the time-dependent changes
+		INPUT:
+			t	- time point
+			y	- initial conditions. y can be an array of floats or integers.
+		OUTPUT:
+			dydt	- y(t) at time point t. dydt is an array of floats or integers.
+
+		"""
+        d = 0.25  # death per day
+        Nx = 10.0  # micro mol per litre
+        Irr = 200.0 # fixed light intensity
+        mu1, mu2, vn1, vn2 = self.strains(Nx=y[2], I=Irr)
+        mu1 = 86400 * mu1  # per day
+        mu2 = 86400 * mu2  # per day
+        vn1 = 86400 * vn1 / 6e17  # micro mol per day
+        vn2 = 86400 * vn2 / 6e17  # micro mol per day
+        dRho1_dt = mu1 * y[0] - d * y[0]  # number of cells
+        dRho2_dt = mu2 * y[1] - d * y[1]  # number of cells
+        dNdt = d * (Nx - y[2]) - vn1 * y[0] - vn2 * y[1]  # micro mol per litre
+        dydt = [dRho1_dt, dRho2_dt, dNdt]
+        return dydt
+
+    def chemostat_variableI(self, y, t):
+        """ODEs used to calculate the time-dependent changes
+		INPUT:
+			t	- time point
+			y	- initial conditions. y can be an array of floats or integers.
+		OUTPUT:
+			dydt	- y(t) at time point t. dydt is an array of floats or integers.
+
+		"""
+        d = 0.25  # death per day
+        Nx = 10.0  # micro mol per litre
+        Irr = abs(100 + 100 * np.sin(2 * np.pi * int(t) / 365))  # yearly cycle
+        mu1, mu2, vn1, vn2 = self.strains(Nx=y[2], I=Irr)
+        mu1 = 86400 * mu1  # per day
+        mu2 = 86400 * mu2  # per day
+        vn1 = 86400 * vn1 / 6e17  # micro mol per day
+        vn2 = 86400 * vn2 / 6e17  # micro mol per day
+        dRho1_dt = mu1 * y[0] - d * y[0]  # number of cells
+        dRho2_dt = mu2 * y[1] - d * y[1]  # number of cells
+        dNdt = d * (Nx - y[2]) - vn1 * y[0] - vn2 * y[1]  # micro mol per litre
+        dydt = [dRho1_dt, dRho2_dt, dNdt]
+        return dydt
+
     def rk2a(self, f, x0, t):
         """Second-order Runge-Kutta method to solve x' = f(x,t) with x(t[0]) = x0.
 
