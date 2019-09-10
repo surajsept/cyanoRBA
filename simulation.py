@@ -16,7 +16,73 @@ class simulate_cyano():
         return print('Cyano model is ready to simulate')
 
     ####################################### Other simulations ######################################
+    
+    def monod(self, df, substrate='Nx'):
+        half_vmax = min(df['Mu'], key=lambda x:abs(x-max(df['Mu'])/2))
+        Km = df.loc[df['Mu'] == half_vmax, substrate]
+        S = np.hstack((np.linspace(min(df[substrate]), 0.05*max(df[substrate]), 4),
+                       np.linspace(0.2*max(df[substrate]), max(df[substrate]), 3)))
+        Km = Km[3]
+        Mu = 86400*max(df['Mu']) * S/(Km + S)
+        return S, Mu
+    
+    def monod1(self, S, mu_max, Km):
+        Mu = mu_max * S/(Km + S)
+        return Mu
+    
+    def haldane1(self, I, mu_max, Kd, K_A):
+        mu = mu_max * I / (K_A + I + Kd * I ** 2)
+        return mu
+    
+    def getS(self, df, substrate):
+        S = np.hstack((np.linspace(min(df[substrate]), 0.05 * max(df[substrate]), 4),
+                       np.linspace(0.2 * max(df[substrate]), max(df[substrate]), 3)))
+        return S
+    
+    def haldane(self, df, Kd=0.56, sigma=0.2, k1=250.0, substrate='Irr'):
+        half_vmax = min(df['Mu'], key=lambda x: abs(x - max(df['Mu']) / 2))
+        Km = df.loc[df['Mu'] == half_vmax, substrate]
+        S = np.hstack((np.linspace(min(df[substrate]), 0.05 * max(df[substrate]), 4),
+                       np.linspace(0.2 * max(df[substrate]), max(df[substrate]), 3)))
+        Km = Km[6]
+        #Ki = (Kd * (sigma * S) ** 2) / (sigma * S + k1 + Kd * sigma * S)
+        Mu = 86400*max(df['Mu']) * S / (Km + S + (S/Kd*sigma)**2)
+        return S, Mu
+    
 
+    def vary_Nx_Cx_Irr(self, model, ub_Nx=10.0, ub_cix=15.0, ub_Irr=1000.0, stepsize=0.01, steps=20, newpars={}):
+        Nx = np.hstack((np.arange(0.01, 0.2 * ub_Nx, stepsize * 0.2 * ub_Nx),
+                        np.linspace(0.2 * ub_Nx, ub_Nx, steps)))
+        
+        Nx = np.linspace(0.1, 10, 10)
+
+        cix = np.hstack((np.arange(0.01, 0.2 * ub_cix, stepsize * 0.2 * ub_cix),
+                         np.linspace(0.2 * ub_cix, ub_cix, steps)))
+        
+        cix = np.linspace(0.1, 15, 10)
+
+        Irr = np.hstack((np.linspace(0.1, 0.2 * ub_Irr, steps), np.linspace(0.2 * ub_Irr, ub_Irr, steps)))
+        Irr = np.linspace(1, 1000, 10)
+        
+        Mu, Flux = [], []
+        for i in range(len(Irr)):
+            Mu0, F = [], []
+            for j in range(len(cix)):
+                mu0, f = [], []
+                for k in range(len(Nx)):
+                    mu, flux = model.binary_search(mu=0.01, Cx=cix[j], Nx=Nx[k], I=Irr[i], newpars=newpars)
+                    mu0.append(mu)
+                    f.append(flux)
+                Mu0.append(mu0)
+                F.append(f)
+            Mu.append(Mu0)
+            Flux.append(F)
+        Mu, Flux = np.array(Mu), np.array(F)
+        stacked = pd.Panel(Mu.swapaxes(1,2)).to_frame().stack().reset_index()
+        stacked.columns = ['Nx', 'Cx', 'Irr', 'Mu']
+        stacked.to_csv('vary_Nx_Cx_Irr.csv', index=False)
+        return Mu, Flux
+    
     def vary_Nx(self, model, I=200.0, Cx=0.25, lb_Nx=0.01, ub_Nx=20.0, steps=20, stepsize=0.1,
                 newpars={}):
         '''

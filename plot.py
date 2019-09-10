@@ -3,7 +3,8 @@ from matplotlib import cm
 import numpy as np
 
 
-def plotLB(y1, y2, y3, ax, model):
+def plotLB(y1, y2, y3, ax, model, axes_title):
+	ax.set_title(axes_title, fontsize=24, fontweight='bold', loc='left')
 	ax.plot(model.p.K_N / y1.Nx, 1 / (86400 * y1.Mu), linewidth=2.0, label='$C_x/K_C = 0.01$')
 	ax.plot(model.p.K_N / y2.Nx, 1 / (86400 * y2.Mu), linewidth=2.0, label='$C_x/K_C = 0.05$')
 	ax.plot(model.p.K_N / y3.Nx, 1 / (86400 * y3.Mu), linewidth=2.0, label='$C_x/K_C = 1.0$')
@@ -14,7 +15,8 @@ def plotLB(y1, y2, y3, ax, model):
 	plt.tight_layout()
 
 
-def plotVm_Mu(y, ax, model):
+def plotVm_Mu(y, ax, model, axes_title):
+	ax.set_title(axes_title, fontsize=24, fontweight='bold', loc='left')
 	ax.loglog(y.Nx / model.p.K_N, y.v5, linewidth=2.0, label='uptake flux')
 	ax.loglog(y.Nx / model.p.K_N, model.p.k5 * y.Tn, linewidth=2.0, label='$V_{max}$')
 	ax.set_xlabel('$N_x/K_N$', fontsize=15)
@@ -26,12 +28,13 @@ def plotVm_Mu(y, ax, model):
 
 def twosubplots(y1, y2, y3, model):
 	fig, ax = plt.subplots(1, 2, figsize=(10, 4))
-	plotVm_Mu(y1, ax[0], model)
-	plotLB(y1, y2, y3, ax[1], model)
+	plotVm_Mu(y1, ax[0], model, 'A')
+	plotLB(y1, y2, y3, ax[1], model, 'B')
 	return plt.show()
 
 
-def plotTnTy_Mu(X, Y, Y0, Y1, ax):
+def plotTnTy_Mu(X, Y, Y0, Y1, ax, axes_title):
+	ax.set_title(axes_title, fontsize=24, fontweight='bold', loc='left')
 	ax.semilogx(X, Y, label='$T_N$-strain')
 	ax.semilogx(X, Y0, label='$T_Y$-strain')
 	ax.semilogx(X, Y1, '--', label='($T_N + T_Y$)-strain')
@@ -44,8 +47,9 @@ def plotTnTy_Mu(X, Y, Y0, Y1, ax):
 
 # return plt.show()
 
-def plotTnTy(X, Y1, Y2, ax):
+def plotTnTy(X, Y1, Y2, ax, axes_title):
 	# fig, ax = plt.subplots(figsize=(5, 4))
+	ax.set_title(axes_title, fontsize=24, fontweight='bold', loc='left')
 	ax.semilogx(X, Y1, label='$T_N$')
 	ax.semilogx(X, Y2, label='$T_Y$')
 	ax.set_xlabel('$N_X/K_N$', fontsize=12)
@@ -59,8 +63,8 @@ def plotTnTy(X, Y1, Y2, ax):
 
 def subplots_TnTy(y_N, y_Y, y_NY, pF_NY, model):
 	fig, ax = plt.subplots(1, 2, figsize=(10, 4))
-	plotTnTy_Mu(y_N.Nx / model.p.K_N, 86400*y_N.Mu, 86400*y_Y.Mu, 86400*y_NY.Mu, ax[0])
-	plotTnTy(y_N.Nx / model.p.K_N, pF_NY.T_N2, pF_NY.T_N1, ax[1])
+	plotTnTy_Mu(y_N.Nx / model.p.K_N, 86400*y_N.Mu, 86400*y_Y.Mu, 86400*y_NY.Mu, ax[0], 'A')
+	plotTnTy(y_N.Nx / model.p.K_N, pF_NY.T_N2, pF_NY.T_N1, ax[1], 'B')
 	return plt.show()
 
 
@@ -144,16 +148,20 @@ def pie_subplots(yN, pFN, yC, pFC, yI, pFI):
 
 def growth_subplots(yN, yC, yI, model, Cx=0.25, Nx=0.5, I=200.0):
 	fig, ax = plt.subplots(1, 3, figsize=[12, 4])
-	growth_curve(ax[0], yN.Nx / 10.0, 86400 * yN.Mu, xlabel='N$_x$/K$_N$',
-	             ylabel='Growth rate, $\mu$ (d$^{-1}$)', text=['$C_x/K_c$ = %.2f' % round(Cx/model.p.K_C,2), 'I = ' + str(int(I)) + '$\mu E$ m$^{-2}$ s$^{-1}$'])
-	growth_curve(ax[1], yC.Cx / 15.0, 86400 * yC.Mu, xlabel='C$_x$/K$_N$',
-	             ylabel='Growth rate, $\mu$ (d$^{-1}$)',  text=['$N_x/K_n$ = %.2f' % round(Nx/model.p.K_N,2), 'I = ' + str(int(I)) + '$\mu E$ m$^{-2}$ s$^{-1}$'])
-	growth_curve(ax[2], yI.Irr, 86400 * yI.Mu, xlabel='I ($\mu$ E m$^{-2}$ s$^{-1}$)',
-	             ylabel='Growth rate, $\mu$ (d$^{-1}$)',  text=['$C_x/K_c$ = %.2f' % round(Cx/model.p.K_C,2), '$N_x/K_n$ = %.2f' % round(Nx/model.p.K_N,2)])
+	growth_curve(ax[0], yN.Nx / 10.0, 86400 * yN.Mu, xlabel='N$_x$/K$_N$', axes_title='A',
+	             ylabel='Growth rate, $\mu$ (d$^{-1}$)',
+	             text=['$C_x/K_C$ = %.2f' % round(Cx/model.p.K_C,2), 'I = ' + str(int(I)) + '$\mu E$ m$^{-2}$ s$^{-1}$'])
+	growth_curve(ax[1], yC.Cx / 15.0, 86400 * yC.Mu, xlabel='C$_x$/K$_C$', axes_title='B',
+	             ylabel='Growth rate, $\mu$ (d$^{-1}$)',
+	             text=['$N_x/K_N$ = %.2f' % round(Nx/model.p.K_N,2), 'I = ' + str(int(I)) + '$\mu E$ m$^{-2}$ s$^{-1}$'])
+	growth_curve(ax[2], yI.Irr, 86400 * yI.Mu, xlabel='I ($\mu$ E m$^{-2}$ s$^{-1}$)', axes_title='C',
+	             ylabel='Growth rate, $\mu$ (d$^{-1}$)',
+	             text=['$C_x/K_c$ = %.2f' % round(Cx/model.p.K_C,2), '$N_x/K_n$ = %.2f' % round(Nx/model.p.K_N,2)])
 	return plt.show()
 
 
-def growth_curve(ax, X, Y, xlabel, ylabel, text, text_lx=0.3, text_ly=0.1):
+def growth_curve(ax, X, Y, xlabel, ylabel, text, axes_title, text_lx=0.3, text_ly=0.1):
+	ax.set_title(axes_title, fontsize=20, fontweight='bold')
 	ax.plot(X, Y, linewidth=2.0)
 	ax.set_xlabel(xlabel, fontsize=15)
 	ax.set_ylabel(ylabel, fontsize=15)
@@ -162,6 +170,36 @@ def growth_curve(ax, X, Y, xlabel, ylabel, text, text_lx=0.3, text_ly=0.1):
 	props = dict(boxstyle='round', facecolor='white', alpha=0.5)
 	textstr = '\n'.join((text))
 	# place a text box in upper left in axes coords
+	ax.text(text_lx, text_ly, textstr, transform=ax.transAxes, fontsize=14,
+	        verticalalignment='bottom', bbox=props)
+	
+def growth_subplots_new(yN, yC, yI, XN, XC, XI, MuN, MuC, MuI, model, Cx=0.25, Nx=0.5, I=200.0):
+	fig, ax = plt.subplots(1, 3, figsize=[12, 4])
+	growth_curve_new(ax=ax[0], X1=yN.Nx / 10.0, Y1=86400 * yN.Mu, X2=XN / 10.0, Y2=MuN, xlabel='N$_x$/K$_N$', axes_title='A',
+	             ylabel='Growth rate, $\mu$ (d$^{-1}$)',
+	             text=['$C_x/K_C$ = %.2f' % round(Cx/model.p.K_C,2), 'I = ' + str(int(I)) + '$\mu E$ m$^{-2}$ s$^{-1}$'])
+	growth_curve_new(ax=ax[1], X1=yC.Cx / 15.0, Y1=86400 * yC.Mu, X2=XC / 15.0, Y2=MuC, xlabel='C$_x$/K$_C$', axes_title='B',
+	             ylabel='Growth rate, $\mu$ (d$^{-1}$)',
+	             text=['$N_x/K_N$ = %.2f' % round(Nx/model.p.K_N,2), 'I = ' + str(int(I)) + '$\mu E$ m$^{-2}$ s$^{-1}$'])
+	growth_curve_new(ax=ax[2], X1=yI.Irr, Y1=86400 * yI.Mu,  X2=XI, Y2=MuI, xlabel='I ($\mu$ E m$^{-2}$ s$^{-1}$)', axes_title='C',
+	             ylabel='Growth rate, $\mu$ (d$^{-1}$)',
+	             text=['$C_x/K_c$ = %.2f' % round(Cx/model.p.K_C,2), '$N_x/K_n$ = %.2f' % round(Nx/model.p.K_N,2)],
+	                 label2='Haldane model', text_lx=0.54)
+	return plt.show()
+	
+def growth_curve_new(ax, X1, Y1, X2, Y2, xlabel, ylabel, text, axes_title, label1='BRAM', label2='Monod',
+                     text_lx=0.35, text_ly=0.05):
+	ax.set_title(axes_title, fontsize=24, fontweight='bold', loc='left')
+	ax.plot(X1, Y1, linewidth=2.0, label=label1)
+	ax.plot(X2, Y2, 'o', label=label2)
+	ax.set_xlabel(xlabel, fontsize=15)
+	ax.set_ylabel(ylabel, fontsize=15)
+	ax.tick_params(labelsize=15)
+	ax.legend(loc=7)
+	plt.tight_layout()
+	props = dict(boxstyle='round', facecolor='white', alpha=0.5)
+	textstr = '\n'.join((text))
+	# place a text box in bottom right in axes coords
 	ax.text(text_lx, text_ly, textstr, transform=ax.transAxes, fontsize=14,
 	        verticalalignment='bottom', bbox=props)
 

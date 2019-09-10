@@ -79,7 +79,7 @@ def cyano_model(mu, Cx, Nx, I, newpars):
 	A_eq3 = np.zeros (len (x_name))
 	A_eq3[x_name.index ('Q')] = p.nQ
 	B_eq3 = np.hstack ((np.zeros (len (rxns) + len (gammas)), alpha_P, [1.0,]))
-	model.addConstr (quicksum (A_eq3[i] * x[i] for i in range (len (A_eq3))) == 0.5 * quicksum (
+	model.addConstr(quicksum (A_eq3[i] * x[i] for i in range (len (A_eq3))) == 0.5 * quicksum (
 		B_eq3[i] * x[i] for i in range (len (A_eq3))), 'fixed_Q_conc_ratio')
 
 	### Constant concentration of dummy P protein
@@ -93,7 +93,7 @@ def cyano_model(mu, Cx, Nx, I, newpars):
 	A_eq4 = np.zeros (len (x_name))
 	A_eq4[x_name.index ('R')] = p.nR
 	B_eq4 = np.hstack ((np.zeros (len (rxns) + len (gammas)), alpha_P, np.zeros (len (Misc))))
-	model.addConstr (quicksum (A_eq4[i] * x[i] for i in range (len (A_eq4))) >= 0.05 *
+	model.addConstr(quicksum (A_eq4[i] * x[i] for i in range (len (A_eq4))) >= 0.05 *
 	                 quicksum (B_eq4[i] * x[i] for i in range (len (A_eq4))), 'fixed_R_conc')
 
 	### Constant concentration of Rubisco
@@ -101,20 +101,19 @@ def cyano_model(mu, Cx, Nx, I, newpars):
 	A_eq4[x_name.index ('CB')] = p.nCB
 	A_eq4[x_name.index ('Mc')] = p.nMc
 	A_eq4[x_name.index ('Mq')] = p.nMq
-	B_eq4 = np.hstack ((np.zeros (len (rxns) + len (gammas)), alpha_P, np.zeros (len (Misc))))
-	model.addConstr (quicksum (A_eq4[i] * x[i] for i in range (len (A_eq4))) >= 0.1 *
-	                 quicksum (B_eq4[i] * x[i] for i in range (len (A_eq4))), 'fixed_CB_conc')
+	B_eq4 = np.hstack((np.zeros(len(rxns) + len(gammas)), alpha_P, np.zeros(len(Misc))))
+	model.addConstr(quicksum(A_eq4[i] * x[i] for i in range(len (A_eq4))) >= 0.1 *
+	                 quicksum (B_eq4[i] * x[i] for i in range(len (A_eq4))), 'fixed_CB_conc')
 
 	### Enzyme capacity R, P1, P2, P3, P4, P5, P6, P7, P
-	enzyme_capacity = np.zeros ([len (RP), len (x_name)])
-	
-	enzyme_capacity[RP.index ('R'), len (rxns):len (rxns) + len (gammas)] = alpha_P / p.g_max
-	np.fill_diagonal (enzyme_capacity[RP.index ('PSU'):, :], 1.0)
+	enzyme_capacity = np.zeros([len(RP), len(x_name)])
+	enzyme_capacity[RP.index('R'), len(rxns):len(rxns) + len(gammas)] = alpha_P / p.g_max
+	np.fill_diagonal(enzyme_capacity[RP.index('PSU'):, :], 1.0)
 	
 	v_PSU = (p.k1 * p.sigma * I) / (p.sigma * I + p.k1 + p.kd * p.sigma * I)
 	v_Tc = (p.k2 * Cx) / (p.K_C + Cx)
 	v_Tn = (p.k5 * Nx) / (p.K_N + Nx)
-	v_d = (p.kd * np.square (p.sigma * I)) / (p.sigma * I + p.k1 + p.kd * p.sigma * I)
+	v_d = (p.kd * np.square(p.sigma * I)) / (p.sigma * I + p.k1 + p.kd * p.sigma * I)
 	
 	rates = [1.0, v_PSU - v_d, v_Tc, p.k3, p.k4, v_Tn, p.k6, p.kP]
 	for i in range (len (enzyme_capacity)):
